@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dakota Morgan</title>
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: 'class' };
+    </script>
+  </head>
+  <body class="antialiased">
+    <div id="root"></div>
+
+    <!-- React (UMD) + Babel for JSX in-browser -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const Section = ({ id, children, className = "" }) => (
+        <section id={id} className={`max-w-6xl mx-auto px-5 sm:px-8 ${className}`}>{children}</section>
+      );
+
+      const Badge = ({ children }) => (
+        <span className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium tracking-wide backdrop-blur border-zinc-200/60 bg-zinc-50/60 dark:border-zinc-800/60 dark:bg-zinc-900/60">
+          {children}
+        </span>
+      );
+
+      const Card = ({ title, children, cta, href }) => (
+        <div className="group relative overflow-hidden rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white/70 dark:bg-zinc-900/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <h3 className="text-lg font-semibold">{title}</h3>
+            </div>
+            <div className="prose prose-zinc max-w-none dark:prose-invert">
+              {children}
+            </div>
+            {cta && (
+              <a
+                href={href || "#contact"}
+                className="mt-4 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm bg-zinc-100/70 dark:bg-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              >
+                {cta} <span aria-hidden>→</span>
+              </a>
+            )}
+          </div>
+          <div className="pointer-events-none absolute -right-16 -bottom-16 h-40 w-40 rounded-full bg-gradient-to-tr from-indigo-500/10 to-sky-400/10 blur-2xl" />
+        </div>
+      );
+
+      const Pill = ({ children }) => (
+        <span className="rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 px-3 py-1 text-xs font-medium">
+          {children}
+        </span>
+      );
+
+      // Bullet-safe <li> to avoid JSX parser issues
+      const BulletLi = ({ children }) => (
+        <li data-test-bullet="true"><span aria-hidden>{"• "}</span><span>{children}</span></li>
+      );
+
+      const projects = [
+        {
+          title: "AutomateCRE — Site-Selection Platform",
+          blurb:
+            "Supabase/Postgres backbone, Mapbox vector tiles, role-based dashboards (admin/franchisee/client), LOI/negotiation tracking, and document vault.",
+          bullets: [
+            "Next.js + Shadcn UI + RLS policies on Supabase",
+            "Mapbox GL + Tippecanoe tiles for large property sets",
+            "Edge Functions for ingestion & webhooks (CSV/JSON/CoStar exports)"
+          ],
+        },
+        {
+          title: "Property Brochure → JSON Pipeline",
+          blurb:
+            "Vision-powered parser that extracts SF, rates, NNN, zoning, contacts, and images from PDFs; yields normalized JSON for upsert.",
+          bullets: [
+            "Batch processing with cost + token logging",
+            "Strict JSON schemas for clean inserts",
+            "Automated manifest + audit trail"
+          ],
+        },
+        {
+          title: "Daily Ops Digest",
+          blurb:
+            "Script that compiles sleep/recovery, workouts, emails, transactions, and app logs into a chronological brief.",
+          bullets: [
+            "Timezone-safe (America/Denver) date handling",
+            "Whoop + inbox + finance feeds",
+            "CLI and scheduled outputs"
+          ],
+        },
+        {
+          title: "BenjiCam + Motion Merge",
+          blurb:
+            "Raspberry Pi camera + nightly clip merger. Produces one clean video per night and prunes originals.",
+          bullets: [
+            "FFmpeg merge + retention policy",
+            "Simple web viewer",
+            "Low-power friendly"
+          ],
+        },
+      ];
+
+      function App() {
+        const [dark, setDark] = useState(true);
+        const [showTests, setShowTests] = useState(false);
+        const [testResults, setTestResults] = useState([]);
+
+        useEffect(() => {
+          document.documentElement.classList.toggle('dark', dark);
+        }, [dark]);
+
+        useEffect(() => {
+          const results = [];
+          results.push({
+            name: "projects[] has titles and bullets",
+            pass: Array.isArray(projects) && projects.every(p => p.title && Array.isArray(p.bullets) && p.bullets.length > 0)
+          });
+          const contactEl = document.getElementById("contact-brief");
+          results.push({ name: "contact brief shows '>'", pass: !!contactEl && contactEl.textContent.includes('>') });
+          const bulletCount = document.querySelectorAll('[data-test-bullet="true"]').length;
+          results.push({ name: "bullet items render", pass: bulletCount >= 25, details: `count=${bulletCount}` });
+          setTestResults(results);
+        }, []);
+
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-white to-zinc-100 text-zinc-900 dark:from-zinc-950 dark:to-zinc-900 dark:text-zinc-100">
+            {/* Header */}
+            <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-zinc-950/40 border-b border-zinc-200/60 dark:border-zinc-800/60">
+              <Section className="py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400" />
+                  <span className="font-semibold tracking-wide">Dakota Morgan</span>
+                  <span className="hidden sm:inline text-zinc-500">— Broker & Builder</span>
+                </div>
+                <nav className="hidden md:flex items-center gap-6 text-sm">
+                  <a href="#about" className="hover:opacity-80">About</a>
+                  <a href="#work" className="hover:opacity-80">Work</a>
+                  <a href="#projects" className="hover:opacity-80">Projects</a>
+                  <a href="#now" className="hover:opacity-80">Now</a>
+                  <a href="#contact" className="hover:opacity-80">Contact</a>
+                  <button onClick={() => setDark(d => !d)} className="rounded-xl border px-2 py-1 text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 border-zinc-200/60 dark:border-zinc-800/60">
+                    {dark ? "Light" : "Dark"}
+                  </button>
+                </nav>
+              </Section>
+            </header>
+
+            {/* Hero */}
+            <Section className="pt-14 pb-12">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight">
+                    I build pipelines — <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-sky-400">deal</span> & <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">data</span>.
+                  </h1>
+                  <p className="mt-4 text-zinc-600 dark:text-zinc-400 max-w-xl">
+                    Commercial tenant rep (CO & TX) obsessed with systems. I hunt great sites, negotiate smart, and back it all with real-time software.
+                    Forward-looking, minimal fluff, measurable outcomes.
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <a href="#contact" className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900">
+                      Work with me <span aria-hidden>→</span>
+                    </a>
+                    <a href="#projects" className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm border border-zinc-200/60 dark:border-zinc-800/60">
+                      See projects <span aria-hidden>↗</span>
+                    </a>
+                  </div>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <Badge>Denver, CO</Badge>
+                    <Badge>Tenant Rep</Badge>
+                    <Badge>Supabase • Mapbox • Next.js</Badge>
+                    <Badge>Benji-approved</Badge>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="aspect-[4/3] rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-900 p-4">
+                    <div className="grid grid-cols-2 gap-4 h-full">
+                      <div className="rounded-xl bg-gradient-to-br from-indigo-500/20 to-sky-400/20 border border-indigo-500/20 p-4">
+                        <h4 className="text-sm font-semibold mb-2">Brokerage</h4>
+                        <ul className="text-sm space-y-1 text-zinc-600 dark:text-zinc-400" id="hero-brokerage">
+                          <BulletLi>Site selection & LOIs</BulletLi>
+                          <BulletLi>Lease negotiation</BulletLi>
+                          <BulletLi>Portfolio strategy</BulletLi>
+                        </ul>
+                      </div>
+                      <div className="rounded-xl bg-gradient-to-br from-sky-400/20 to-indigo-500/20 border border-sky-400/20 p-4">
+                        <h4 className="text-sm font-semibold mb-2">Software</h4>
+                        <ul className="text-sm space-y-1 text-zinc-600 dark:text-zinc-400" id="hero-software">
+                          <BulletLi>Map dashboards</BulletLi>
+                          <BulletLi>Data ingestion</BulletLi>
+                          <BulletLi>AI-powered parsing</BulletLi>
+                        </ul>
+                      </div>
+                      <div className="col-span-2 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 p-4">
+                        <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+                          <span className="inline-block h-4 w-4 rounded-full border" />
+                          <span>Systems mindset: automate the busywork, focus on decisions.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pointer-events-none absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-gradient-to-tr from-indigo-500/10 to-sky-400/10 blur-2xl" />
+                </div>
+              </div>
+            </Section>
+
+            {/* About */}
+            <Section id="about" className="py-10">
+              <div className="grid md:grid-cols-3 gap-6 items-start">
+                <div className="md:col-span-2">
+                  <h2 className="text-2xl font-bold mb-3">About</h2>
+                  <p className="text-zinc-600 dark:text-zinc-400">
+                    I’m an entrepreneur and commercial real estate tenant rep who also ships software. My lane: pairing disciplined brokerage execution with a modern data stack so clients see options faster, negotiate better, and track everything cleanly.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Pill>CO & TX licensed</Pill>
+                    <Pill>Tenant representation</Pill>
+                    <Pill>Supabase • Next.js • Mapbox</Pill>
+                    <Pill>Vision OCR pipelines</Pill>
+                    <Pill>Role-based dashboards</Pill>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 p-4">
+                    <div className="text-sm font-semibold mb-2">Availability</div>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Open to selective tenant rep engagements and product collaborations.</p>
+                  </div>
+                  <div className="rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 p-4">
+                    <div className="text-sm font-semibold mb-2">Working stack</div>
+                    <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-1">
+                      <BulletLi>Supabase (Postgres + RLS)</BulletLi>
+                      <BulletLi>Next.js + Tailwind</BulletLi>
+                      <BulletLi>Mapbox GL + Tippecanoe</BulletLi>
+                      <BulletLi>Python microservices</BulletLi>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </Section>
+
+            {/* Work */}
+            <Section id="work" className="py-10">
+              <h2 className="text-2xl font-bold mb-4">Work</h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card title="Brokerage — Tenant Representation" cta="Start a search" href="#contact">
+                  <ul>
+                    <BulletLi>Site selection across targeted trade areas with data-backed comps.</BulletLi>
+                    <BulletLi>LOI → lease negotiation with clear economics tracking.</BulletLi>
+                    <BulletLi>Portfolio planning and market rollouts.</BulletLi>
+                  </ul>
+                </Card>
+                <Card title="Software — AutomateCRE" cta="See the platform" href="#projects">
+                  <ul>
+                    <BulletLi>Client-facing dashboards (admin, franchisee, broker views).</BulletLi>
+                    <BulletLi>Property vault with docs, photos, and versioned notes.</BulletLi>
+                    <BulletLi>Ingestion of CoStar/CSV exports with validation and logs.</BulletLi>
+                  </ul>
+                </Card>
+              </div>
+            </Section>
+
+            {/* Projects */}
+            <Section id="projects" className="py-10">
+              <h2 className="text-2xl font-bold mb-4">Selected Projects</h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                {projects.map((p, i) => (
+                  <div key={p.title} className="transition-opacity">
+                    <Card title={p.title}>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">{p.blurb}</p>
+                      <ul className="mt-2 text-sm space-y-1">
+                        {p.bullets.map((b) => (
+                          <BulletLi key={b}>{b}</BulletLi>
+                        ))}
+                      </ul>
+                    </Card>
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            {/* Now */}
+            <Section id="now" className="py-10">
+              <h2 className="text-2xl font-bold mb-3">Now</h2>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 p-5">
+                  <p className="text-zinc-700 dark:text-zinc-300">
+                    <strong>August 2025:</strong> shipping the AutomateCRE MVP, refining ingestion → dashboard loops, and lining up selective tenant rep assignments. Also experimenting with multi-agent parsing for property brochures and Mapbox vector tiles for faster market views.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 p-5">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">Side quests</p>
+                  <ul className="mt-2 text-sm space-y-1">
+                    <BulletLi>BenjiCam night merges</BulletLi>
+                    <BulletLi>Whoop-informed training blocks</BulletLi>
+                    <BulletLi>Light UI polish sprints</BulletLi>
+                  </ul>
+                </div>
+              </div>
+            </Section>
+
+            {/* Contact */}
+            <Section id="contact" className="py-12">
+              <div className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 p-6 md:p-10 bg-white/70 dark:bg-zinc-900/60">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                  <div>
+                    <h2 className="text-2xl font-bold">Let’s talk</h2>
+                    <p id="contact-brief" className="mt-2 text-zinc-600 dark:text-zinc-400 max-w-xl">
+                      Brief &gt; broad. If you’ve got a market to attack or a platform to build, I’m your guy. One email and we’ll get moving.
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Pill>Data-first brokerage</Pill>
+                      <Pill>Denver-based, national reach</Pill>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href="mailto:hello@example.com?subject=Dakota%20—%20Let%E2%80%99s%20work"
+                      className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                    >
+                      Email Dakota
+                    </a>
+                    <a
+                      href="#"
+                      className="inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm border border-zinc-200/60 dark:border-zinc-800/60"
+                    >
+                      Book a slot
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </Section>
+
+            {/* Dev tests (toggle) */}
+            <Section className="py-4">
+              <div className="rounded-2xl border border-dashed border-zinc-300/70 dark:border-zinc-700/70 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Self-tests</span>
+                  <button onClick={() => setShowTests(v => !v)} className="text-xs rounded-lg border px-2 py-1 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    {showTests ? "Hide" : "Run"}
+                  </button>
+                </div>
+                {showTests && (
+                  <ul className="mt-3 text-xs space-y-1">
+                    {testResults.map((t, i) => (
+                      <li key={i} className={t.pass ? "text-green-600" : "text-red-600"}>
+                        {t.pass ? "✓" : "✕"} {t.name}{t.details ? ` — ${t.details}` : ""}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </Section>
+
+            {/* Footer */}
+            <footer className="py-10">
+              <Section>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-zinc-500">
+                  <div>© {new Date().getFullYear()} Dakota Morgan</div>
+                  <div className="flex items-center gap-3">
+                    <a href="#projects" className="hover:opacity-80">Projects</a>
+                    <a href="#work" className="hover:opacity-80">Work</a>
+                    <a href="#contact" className="hover:opacity-80">Contact</a>
+                  </div>
+                </div>
+              </Section>
+            </footer>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
